@@ -4,6 +4,7 @@ namespace Laravel\Tinker;
 
 use Exception;
 use Symfony\Component\VarDumper\Caster\Caster;
+use Cvsouth\EloquentInheritance\InheritableModel;
 
 class TinkerCaster
 {
@@ -76,8 +77,14 @@ class TinkerCaster
      */
     public static function castModel($model)
     {
+        if(is_dir(base_path() . '/vendor/cvsouth/eloquent-inheritance') && $model instanceof InheritableModel) {
+            $attributes = $model->getRecursiveAttributes();
+        } else {
+            $attributes = $model->getAttributes();
+        }
+        
         $attributes = array_merge(
-            $model->getAttributes(), $model->getRelations()
+           $attributes , $model->getRelations()
         );
 
         $visible = array_flip(
